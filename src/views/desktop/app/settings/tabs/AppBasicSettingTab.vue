@@ -323,6 +323,17 @@
                                     v-model="hideCategoriesWithoutAccounts"
                                 />
                             </v-col>
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    item-title="displayName"
+                                    item-value="type"
+                                    persistent-placeholder
+                                    :label="tt('Default Date Range for Reconciliation Statement Button')"
+                                    :placeholder="tt('Default Date Range for Reconciliation Statement Button')"
+                                    :items="allReconciliationStatementDateRanges"
+                                    v-model="reconciliationStatementButtonDefaultDateRangeTypeInDesktop"
+                                />
+                            </v-col>
                         </v-row>
                     </v-card-text>
                 </v-form>
@@ -392,6 +403,7 @@ import type { LocalizedSwitchOption } from '@/core/base.ts';
 import { ThemeType } from '@/core/theme.ts';
 import { type LocalizedDateRange, DateRangeScene } from '@/core/datetime.ts';
 import { CategoryType } from '@/core/category.ts';
+import { DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_DESKTOP } from '@/core/statistics.ts';
 
 import { getSystemTheme } from '@/lib/ui/common.ts';
 
@@ -409,6 +421,7 @@ const {
     allTimezoneTypesUsedForStatistics,
     allCurrencySortingTypes,
     allAutoSaveTransactionDraftTypes,
+    allReconciliationStatementDateRanges,
     hasAnyAccount,
     hasAnyVisibleAccount,
     hasAnyTransactionCategory,
@@ -426,7 +439,8 @@ const {
     accountsIncludedInHomePageOverviewDisplayContent,
     accountsIncludedInTotalDisplayContent,
     accountCategorysDisplayOrderContent,
-    transactionCategoriesIncludedInHomePageOverviewDisplayContent
+    transactionCategoriesIncludedInHomePageOverviewDisplayContent,
+    getValidReconciliationStatementPageDefaultDateRangeType
 } = useAppSettingPageBase();
 
 const settingsStore = useSettingsStore();
@@ -481,6 +495,11 @@ const showTagInInsightsExplorerPage = computed<boolean>({
 const hideCategoriesWithoutAccounts = computed<boolean>({
     get: () => settingsStore.appSettings.hideCategoriesWithoutAccounts,
     set: (value) => settingsStore.setHideCategoriesWithoutAccounts(value)
+});
+
+const reconciliationStatementButtonDefaultDateRangeTypeInDesktop = computed<number>({
+    get: () => getValidReconciliationStatementPageDefaultDateRangeType(settingsStore.appSettings.reconciliationStatementButtonDefaultDateRangeTypeInDesktop, DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_DESKTOP.type),
+    set: (value: number) => settingsStore.setReconciliationStatementButtonDefaultDateRangeTypeInDesktop(value)
 });
 
 function init(): void {

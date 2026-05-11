@@ -12,7 +12,9 @@ import {
     ChartSortingType,
     DEFAULT_CATEGORICAL_CHART_DATA_RANGE,
     DEFAULT_TREND_CHART_DATA_RANGE,
-    DEFAULT_ASSET_TRENDS_CHART_DATA_RANGE
+    DEFAULT_ASSET_TRENDS_CHART_DATA_RANGE,
+    DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_DESKTOP,
+    DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_MOBILE,
 } from './statistics.ts';
 import { DEFAULT_TRANSACTION_EXPLORER_DATE_RANGE } from './explorer.ts';
 import { DEFAULT_CURRENCY_CODE } from '@/consts/currency.ts';
@@ -66,6 +68,8 @@ export interface ApplicationSettings extends BaseApplicationSetting {
     totalAmountExcludeAccountIds: Record<string, boolean>;
     accountCategoryOrders: string;
     hideCategoriesWithoutAccounts: boolean;
+    reconciliationStatementButtonDefaultDateRangeTypeInDesktop: number;
+    reconciliationStatementPageDefaultDateRangeTypeInMobile: number;
     // Exchange Rates Data Page
     currencySortByInExchangeRatesPage: number;
     // Browser Cache Management
@@ -144,6 +148,8 @@ export const ALL_ALLOWED_CLOUD_SYNC_APP_SETTING_KEY_TYPES: Record<string, UserAp
     'totalAmountExcludeAccountIds': UserApplicationCloudSettingType.StringBooleanMap,
     'accountCategoryOrders': UserApplicationCloudSettingType.String,
     'hideCategoriesWithoutAccounts': UserApplicationCloudSettingType.Boolean,
+    'reconciliationStatementButtonDefaultDateRangeTypeInDesktop': UserApplicationCloudSettingType.Number,
+    'reconciliationStatementPageDefaultDateRangeTypeInMobile': UserApplicationCloudSettingType.Number,
     // Exchange Rates Data Page
     'currencySortByInExchangeRatesPage': UserApplicationCloudSettingType.Number,
     // Browser Cache Management
@@ -204,6 +210,8 @@ export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
     totalAmountExcludeAccountIds: {},
     accountCategoryOrders: '',
     hideCategoriesWithoutAccounts: false,
+    reconciliationStatementButtonDefaultDateRangeTypeInDesktop: DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_DESKTOP.type,
+    reconciliationStatementPageDefaultDateRangeTypeInMobile: DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_MOBILE.type,
     // Exchange Rates Data Page
     currencySortByInExchangeRatesPage: CurrencySortingType.Default.type,
     // Browser Cache Management

@@ -357,13 +357,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, nextTick } from 'vue';
 import type { Router } from 'framework7/types';
 
 import { useI18n } from '@/locales/helpers.ts';
 import { useI18nUIComponents, showLoading, hideLoading, onSwipeoutDeleted } from '@/lib/ui/mobile.ts';
 import { useReconciliationStatementPageBase } from '@/views/base/accounts/ReconciliationStatementPageBase.ts';
 
+import { useSettingsStore } from '@/stores/setting.ts';
+import { useUserStore } from '@/stores/user.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionsStore } from '@/stores/transaction.ts';
@@ -372,6 +374,7 @@ import { TextDirection } from '@/core/text.ts';
 import { type TimeRangeAndDateType, DateRange, DateRangeScene } from '@/core/datetime.ts';
 import { AccountType } from '@/core/account.ts';
 import { TransactionType } from '@/core/transaction.ts';
+import { DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_MOBILE } from '@/core/statistics.ts';
 import { TRANSACTION_MIN_AMOUNT, TRANSACTION_MAX_AMOUNT } from '@/consts/transaction.ts';
 import { type TransactionReconciliationStatementResponseItemWithInfo } from '@/models/transaction.ts';
 
@@ -448,6 +451,8 @@ const {
     getDisplayAccountBalance
 } = useReconciliationStatementPageBase();
 
+const settingsStore = useSettingsStore();
+const userStore = useUserStore();
 const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionsStore = useTransactionsStore();
@@ -455,7 +460,7 @@ const transactionsStore = useTransactionsStore();
 const finishQuery = ref<boolean>(false);
 const loading = ref<boolean>(false);
 const loadingError = ref<unknown | null>(null);
-const queryDateRangeType = ref<number>(DateRange.ThisMonth.type);
+const queryDateRangeType = ref<number>(DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_MOBILE.type);
 const showAccountBalanceTrendsCharts = ref<boolean>(false);
 const updatingLastReconciledTime = ref<boolean>(false);
 const transactionToDelete = ref<TransactionReconciliationStatementResponseItemWithInfo | null>(null);
@@ -474,7 +479,7 @@ const validQuery = computed(() => currentAccount.value && currentAccount.value.t
 const allAvailableDateRanges = computed(() => getAllDateRanges(DateRangeScene.Normal, {
     includeCustom: true,
     includeBillingCycle: !!accountsStore.getAccountStatementDate(accountId.value),
-    includeLastReconciledTimeRange: !!currentAccountLastReconciledTime.value
+    includeLastReconciledTimeRange: userStore.currentUserUseLastReconciledTime && !!currentAccountLastReconciledTime.value
 }));
 
 const allReconciliationStatementVirtualListItems = computed<ReconciliationStatementVirtualListItem[]>(() => {
@@ -529,12 +534,33 @@ function init(): void {
     endTime.value = defaultDateRange?.maxTime || 0;
     reconciliationStatements.value = undefined;
 
+    initDateFilter();
+
     Promise.all([
         accountsStore.loadAllAccounts({ force: false }),
         transactionCategoriesStore.loadAllCategories({ force: false })
     ]).catch(error => {
         loadingError.value = error;
         showToast(error.message || error);
+    });
+}
+
+function initDateFilter(): void {
+    let defaultDateRangeType = settingsStore.appSettings.reconciliationStatementPageDefaultDateRangeTypeInMobile;
+    const defualtDateRange = DateRange.valueOf(defaultDateRangeType);
+
+    if (!defualtDateRange) {
+        defaultDateRangeType = DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_MOBILE.type;
+    } else if (defualtDateRange.isBillingCycle && !accountsStore.getAccountStatementDate(accountId.value)) {
+        defaultDateRangeType = DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_MOBILE.type;
+    } else if (defualtDateRange.isLastReconciledTimeRange && (!userStore.currentUserUseLastReconciledTime || !currentAccount.value || !currentAccount.value.lastReconciledTime)) {
+        defaultDateRangeType = DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_MOBILE.type;
+    } else {
+        defaultDateRangeType = defualtDateRange.type;
+    }
+
+    nextTick(() => {
+        changeDateFilter(defaultDateRangeType);
     });
 }
 

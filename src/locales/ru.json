@@ -2356,6 +2356,8 @@
     "Account category order saved": "Порядок категорий счетов сохранен",
     "Unable to move account category": "Не удалось переместить категорию счёта",
     "Hide Categories Without Accounts": "Скрыть категории без счетов",
+    "Default Date Range for Reconciliation Statement Button": "Default Date Range for Reconciliation Statement Button",
+    "Default Date Range for Reconciliation Statement Page": "Default Date Range for Reconciliation Statement Page",
     "Exchange Rates Data Page": "Страница данных о курсах валют",
     "Exchange Rate": "Курс обмена",
     "Enable Swipe Back": "Включить свайп назад",

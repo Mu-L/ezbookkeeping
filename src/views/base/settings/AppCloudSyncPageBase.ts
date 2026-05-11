@@ -78,7 +78,9 @@ export const ALL_APPLICATION_CLOUD_SETTINGS: CategorizedApplicationCloudSettingI
         items: [
             { settingKey: 'totalAmountExcludeAccountIds', settingName: 'Accounts Included in Total', mobile: true, desktop: true },
             { settingKey: 'accountCategoryOrders', settingName: 'Account Category Order', mobile: true, desktop: true },
-            { settingKey: 'hideCategoriesWithoutAccounts', settingName: 'Hide Categories Without Accounts', mobile: false, desktop: true }
+            { settingKey: 'hideCategoriesWithoutAccounts', settingName: 'Hide Categories Without Accounts', mobile: false, desktop: true },
+            { settingKey: 'reconciliationStatementButtonDefaultDateRangeTypeInDesktop', settingName: 'Default Date Range for Reconciliation Statement Button', mobile: false, desktop: true },
+            { settingKey: 'reconciliationStatementPageDefaultDateRangeTypeInMobile', settingName: 'Default Date Range for Reconciliation Statement Page', mobile: true, desktop: false }
         ]
     },
     {

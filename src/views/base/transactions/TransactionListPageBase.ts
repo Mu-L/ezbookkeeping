@@ -110,7 +110,7 @@ export function useTransactionListPageBase() {
     const allDateRanges = computed<LocalizedDateRange[]>(() => getAllDateRanges(DateRangeScene.Normal, {
         includeCustom: true,
         includeBillingCycle: !!accountsStore.getAccountStatementDate(query.value.accountIds),
-        includeLastReconciledTimeRange: !!allAccountsMap.value[query.value.accountIds]?.lastReconciledTime
+        includeLastReconciledTimeRange: userStore.currentUserUseLastReconciledTime && !!allAccountsMap.value[query.value.accountIds]?.lastReconciledTime
     }));
 
     const allAccounts = computed<Account[]>(() => accountsStore.allMixedPlainAccounts);

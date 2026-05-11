@@ -317,6 +317,18 @@ export const useSettingsStore = defineStore('settings', () => {
         updateUserApplicationCloudSettingValue('hideCategoriesWithoutAccounts', value);
     }
 
+    function setReconciliationStatementButtonDefaultDateRangeTypeInDesktop(value: number): void {
+        updateApplicationSettingsValue('reconciliationStatementButtonDefaultDateRangeTypeInDesktop', value);
+        appSettings.value.reconciliationStatementButtonDefaultDateRangeTypeInDesktop = value;
+        updateUserApplicationCloudSettingValue('reconciliationStatementButtonDefaultDateRangeTypeInDesktop', value);
+    }
+
+    function setReconciliationStatementPageDefaultDateRangeTypeInMobile(value: number): void {
+        updateApplicationSettingsValue('reconciliationStatementPageDefaultDateRangeTypeInMobile', value);
+        appSettings.value.reconciliationStatementPageDefaultDateRangeTypeInMobile = value;
+        updateUserApplicationCloudSettingValue('reconciliationStatementPageDefaultDateRangeTypeInMobile', value);
+    }
+
     // Exchange Rates Data Page
     function setCurrencySortByInExchangeRatesPage(value: number): void {
         updateApplicationSettingsValue('currencySortByInExchangeRatesPage', value);
@@ -558,6 +570,8 @@ export const useSettingsStore = defineStore('settings', () => {
         setTotalAmountExcludeAccountIds,
         setAccountCategoryOrders,
         setHideCategoriesWithoutAccounts,
+        setReconciliationStatementButtonDefaultDateRangeTypeInDesktop,
+        setReconciliationStatementPageDefaultDateRangeTypeInMobile,
         // -- Exchange Rates Data Page
         setCurrencySortByInExchangeRatesPage,
         // -- Browser Cache Management

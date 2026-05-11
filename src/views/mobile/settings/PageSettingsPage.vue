@@ -218,6 +218,31 @@
                     <div>{{ accountCategorysDisplayOrderContent }}</div>
                 </template>
             </f7-list-item>
+            <f7-list-item
+                class="item-truncate-after-text"
+                link="#"
+                @click="showReconciliationStatementDefaultDateRangePopup = true"
+            >
+                <template #after-title>
+                    <div class="item-actual-title">
+                        <span>{{ tt('Default Date Range for Reconciliation Statement Page') }}</span>
+                    </div>
+                </template>
+                <template #after>
+                    {{ findDisplayNameByType(allReconciliationStatementDateRanges, reconciliationStatementPageDefaultDateRangeTypeInMobile) }}
+                </template>
+                <list-item-selection-popup value-type="item"
+                                           key-field="type" value-field="type"
+                                           title-field="displayName"
+                                           :title="tt('Default Date Range')"
+                                           :enable-filter="true"
+                                           :filter-placeholder="tt('Date Range')"
+                                           :filter-no-items-text="tt('No results')"
+                                           :items="allReconciliationStatementDateRanges"
+                                           v-model:show="showReconciliationStatementDefaultDateRangePopup"
+                                           v-model="reconciliationStatementPageDefaultDateRangeTypeInMobile">
+                </list-item-selection-popup>
+            </f7-list-item>
         </f7-list>
 
         <f7-block-title>{{ tt('Exchange Rates Data Page') }}</f7-block-title>
@@ -265,6 +290,7 @@ import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import type { TypeAndDisplayName } from '@/core/base.ts';
 import { CategoryType } from '@/core/category.ts';
 import { TransactionQuickSaveButtonStyle } from '@/core/transaction.ts';
+import { DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_MOBILE } from '@/core/statistics.ts';
 
 import { findNameByValue, findDisplayNameByType } from '@/lib/common.ts';
 
@@ -283,6 +309,7 @@ const {
     allTimezoneTypesUsedForStatistics,
     allCurrencySortingTypes,
     allAutoSaveTransactionDraftTypes,
+    allReconciliationStatementDateRanges,
     showAmountInHomePage,
     timezoneUsedForStatisticsInHomePage,
     showTotalAmountInTransactionListPage,
@@ -293,7 +320,8 @@ const {
     accountsIncludedInHomePageOverviewDisplayContent,
     accountsIncludedInTotalDisplayContent,
     accountCategorysDisplayOrderContent,
-    transactionCategoriesIncludedInHomePageOverviewDisplayContent
+    transactionCategoriesIncludedInHomePageOverviewDisplayContent,
+    getValidReconciliationStatementPageDefaultDateRangeType
 } = useAppSettingPageBase();
 
 const settingsStore = useSettingsStore();
@@ -304,6 +332,7 @@ const showTimezoneUsedForStatisticsInHomePagePopup = ref<boolean>(false);
 const showQuickSaveButtonStyleInMobileTransactionListPagePopup = ref<boolean>(false);
 const showQuickAddButtonActionInMobileTransactionEditPagePopup = ref<boolean>(false);
 const showAutoSaveTransactionDraftPopup = ref<boolean>(false);
+const showReconciliationStatementDefaultDateRangePopup = ref<boolean>(false);
 const showCurrencySortByInExchangeRatesPagePopup = ref<boolean>(false);
 
 const allTransactionQuickSaveButtonStyles = computed<TypeAndDisplayName[]>(() => getAllTransactionQuickSaveButtonStyles());
@@ -322,6 +351,11 @@ const quickAddButtonActionInMobileTransactionEditPage = computed<number>({
 const alwaysShowTransactionPicturesInMobileTransactionEditPage = computed<boolean>({
     get: () => settingsStore.appSettings.alwaysShowTransactionPicturesInMobileTransactionEditPage,
     set: (value) => settingsStore.setAlwaysShowTransactionPicturesInMobileTransactionEditPage(value)
+});
+
+const reconciliationStatementPageDefaultDateRangeTypeInMobile = computed<number>({
+    get: () => getValidReconciliationStatementPageDefaultDateRangeType(settingsStore.appSettings.reconciliationStatementPageDefaultDateRangeTypeInMobile, DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_MOBILE.type),
+    set: (value: number) => settingsStore.setReconciliationStatementPageDefaultDateRangeTypeInMobile(value)
 });
 
 function init(): void {

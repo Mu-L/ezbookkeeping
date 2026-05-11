@@ -2356,6 +2356,8 @@
     "Account category order saved": "账户分类顺序已保存",
     "Unable to move account category": "无法移动账户分类",
     "Hide Categories Without Accounts": "隐藏没有账户的分类",
+    "Default Date Range for Reconciliation Statement Button": "对账单按钮默认时间范围",
+    "Default Date Range for Reconciliation Statement Page": "对账单页面默认时间范围",
     "Exchange Rates Data Page": "汇率数据页面",
     "Exchange Rate": "汇率",
     "Enable Swipe Back": "启用侧滑返回",

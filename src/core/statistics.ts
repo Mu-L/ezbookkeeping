@@ -297,3 +297,6 @@ export enum ExportMermaidChartType {
 export const DEFAULT_CATEGORICAL_CHART_DATA_RANGE: DateRange = DateRange.ThisMonth;
 export const DEFAULT_TREND_CHART_DATA_RANGE: DateRange = DateRange.ThisYear;
 export const DEFAULT_ASSET_TRENDS_CHART_DATA_RANGE: DateRange = DateRange.ThisYear;
+
+export const DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_DESKTOP: DateRange = DateRange.Custom;
+export const DEFAULT_RECONCILIATION_STATEMENT_DATE_RANGE_IN_MOBILE: DateRange = DateRange.ThisMonth;
