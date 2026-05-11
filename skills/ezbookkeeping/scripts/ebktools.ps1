@@ -1309,7 +1309,7 @@ function Parse-CommandArgs {
                         }
                         "boolean" {
                             if ($paramValue -match "^(true|false|1|0)$") {
-                                $params[$paramName] = ($paramValue -eq "true" -or $paramValue -eq "1")
+                                $params[$paramName] = ($paramValue -eq "true" -or $paramValue -eq "1").ToString().ToLower()
                             } else {
                                 Write-Red "Error: Parameter '-$paramName' must be a boolean value (true/false or 1/0)"
                                 exit 1
