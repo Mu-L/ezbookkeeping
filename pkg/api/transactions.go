@@ -25,6 +25,7 @@ import (
 )
 
 const pageCountForAccountStatement = 1000
+const pageCountForMovingAccountTransactions = 1000
 
 // TransactionsApi represents transaction api
 type TransactionsApi struct {
@@ -1936,11 +1937,28 @@ func (a *TransactionsApi) TransactionMoveAllBetweenAccountsHandler(c *core.WebCo
 		return nil, errs.NewIncompleteOrIncorrectSubmissionError(err)
 	}
 
+	clientTimezone, err := c.GetClientTimezone()
+
+	if err != nil {
+		log.Warnf(c, "[transactions.TransactionMoveAllBetweenAccountsHandler] cannot get client timezone, because %s", err.Error())
+		return nil, errs.ErrClientTimezoneOffsetInvalid
+	}
+
+	uid := c.GetCurrentUid()
+	user, err := a.users.GetUserById(c, uid)
+
+	if err != nil {
+		if !errs.IsCustomError(err) {
+			log.Errorf(c, "[transactions.TransactionMoveAllBetweenAccountsHandler] failed to get user, because %s", err.Error())
+		}
+
+		return nil, errs.ErrUserNotFound
+	}
+
 	if transactionMoveReq.FromAccountId == transactionMoveReq.ToAccountId {
 		return nil, errs.ErrCannotMoveTransactionToSameAccount
 	}
 
-	uid := c.GetCurrentUid()
 	accountMap, err := a.accounts.GetAccountsByAccountIds(c, uid, []int64{transactionMoveReq.FromAccountId, transactionMoveReq.ToAccountId})
 
 	if err != nil {
@@ -1972,7 +1990,38 @@ func (a *TransactionsApi) TransactionMoveAllBetweenAccountsHandler(c *core.WebCo
 		return nil, errs.ErrCannotMoveTransactionBetweenAccountsWithDifferentCurrencies
 	}
 
-	err = a.transactions.MoveAllTransactionsBetweenAccounts(c, uid, transactionMoveReq.FromAccountId, transactionMoveReq.ToAccountId)
+	transactions, err := a.transactions.GetAllSpecifiedTransactions(c, uid, 0, 0, 0, nil, []int64{fromAccount.AccountId}, nil, false, "", "", false, pageCountForMovingAccountTransactions, true)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionMoveAllBetweenAccountsHandler] failed to get all transactions of account \"id:%d\" for user \"uid:%d\", because %s", fromAccount.AccountId, uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	allUsedAccounts, err := a.getTransactionUsedAccounts(c, uid, transactions)
+
+	if err != nil {
+		log.Errorf(c, "[transactions.TransactionMoveAllBetweenAccountsHandler] failed to get transaction used accounts for user \"uid:%d\", because %s", uid, err.Error())
+		return nil, errs.Or(err, errs.ErrOperationFailed)
+	}
+
+	for i := 0; i < len(transactions); i++ {
+		transaction := transactions[i]
+		transactionEditable := user.CanEditTransactionByTransactionTime(transaction.TransactionTime, clientTimezone, allUsedAccounts[transaction.AccountId], allUsedAccounts[transaction.RelatedAccountId])
+		newTransactionEditable := transactionEditable
+
+		if transaction.AccountId == fromAccount.AccountId {
+			newTransactionEditable = user.CanEditTransactionByTransactionTime(transaction.TransactionTime, clientTimezone, toAccount, allUsedAccounts[transaction.RelatedAccountId])
+		} else if transaction.RelatedAccountId == fromAccount.AccountId {
+			newTransactionEditable = user.CanEditTransactionByTransactionTime(transaction.TransactionTime, clientTimezone, allUsedAccounts[transaction.AccountId], toAccount)
+		}
+
+		if !transactionEditable || !newTransactionEditable {
+			log.Warnf(c, "[transactions.TransactionMoveAllBetweenAccountsHandler] transaction \"id:%d\" is not editable for user \"uid:%d\"", transaction.TransactionId, uid)
+			return nil, errs.ErrCannotModifyTransactionWithThisTransactionTime
+		}
+	}
+
+	err = a.transactions.MoveAllTransactionsBetweenAccounts(c, uid, fromAccount.AccountId, toAccount.AccountId)
 
 	if err != nil {
 		log.Errorf(c, "[transactions.TransactionMoveAllBetweenAccountsHandler] failed to move all transactions from account \"id:%d\" to account \"id:%d\" for user \"uid:%d\", because %s", transactionMoveReq.FromAccountId, transactionMoveReq.ToAccountId, uid, err.Error())
