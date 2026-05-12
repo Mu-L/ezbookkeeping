@@ -14,6 +14,8 @@ import (
 	"github.com/mayswind/ezbookkeeping/pkg/utils"
 )
 
+const pageCountForLoadTransactions = 1000
+
 // MCPQueryTransactionsRequest represents all parameters of the query transactions request
 type MCPQueryTransactionsRequest struct {
 	StartTime             string `json:"start_time" jsonschema:"format=date-time" jsonschema_description:"Start time for the query in RFC 3339 format (e.g. 2023-01-01T12:00:00Z)"`
@@ -160,7 +162,7 @@ func (h *mcpQueryTransactionsToolHandler) Handle(c *core.WebContext, callToolReq
 		return nil, nil, err
 	}
 
-	transactions, err := services.GetTransactionService().GetTransactionsByMaxTime(c, uid, maxTransactionTime, minTransactionTime, transactionType, filterCategoryIds, filterAccountIds, nil, false, "", queryTransactionsRequest.Keyword, false, queryTransactionsRequest.Page, queryTransactionsRequest.Count, false, true)
+	transactions, err := services.GetTransactionService().GetTransactionsByMaxTimeUpToCount(c, uid, maxTransactionTime, minTransactionTime, transactionType, filterCategoryIds, filterAccountIds, nil, false, "", queryTransactionsRequest.Keyword, false, queryTransactionsRequest.Page, queryTransactionsRequest.Count, pageCountForLoadTransactions, false, true)
 	structuredResponse, response, err := h.createNewMCPQueryTransactionsResponse(c, &queryTransactionsRequest, transactions, totalCount, services.GetAccountService().GetAccountMapByList(allAccounts), services.GetTransactionCategoryService().GetCategoryMapByList(allCategories))
 
 	if err != nil {
