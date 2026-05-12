@@ -55,7 +55,7 @@ func (s *TransactionService) GetAllTransactions(c core.Context, uid int64, pageC
 	var allTransactions []*models.Transaction
 
 	for maxTransactionTime > 0 {
-		transactions, err := s.GetAllTransactionsByMaxTime(c, uid, maxTransactionTime, pageCount, noDuplicated)
+		transactions, err := s.GetTransactionsByMaxTime(c, uid, maxTransactionTime, 0, 0, nil, nil, nil, false, "", "", false, 1, pageCount, false, noDuplicated)
 
 		if err != nil {
 			return nil, err
@@ -72,11 +72,6 @@ func (s *TransactionService) GetAllTransactions(c core.Context, uid int64, pageC
 	}
 
 	return allTransactions, nil
-}
-
-// GetAllTransactionsByMaxTime returns all transactions before given time
-func (s *TransactionService) GetAllTransactionsByMaxTime(c core.Context, uid int64, maxTransactionTime int64, count int32, noDuplicated bool) ([]*models.Transaction, error) {
-	return s.GetTransactionsByMaxTime(c, uid, maxTransactionTime, 0, 0, nil, nil, nil, false, "", "", false, 1, count, false, noDuplicated)
 }
 
 // GetAllSpecifiedTransactions returns all transactions that match given conditions
