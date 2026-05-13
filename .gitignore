@@ -151,13 +151,13 @@ dist/
 # Binary and build files
 ezbookkeeping
 !**/ezbookkeeping/
-package/
+/package/
 
 # Environment variable files
 .env
 **/.env
 
 # Other directories
-data/
-storage/
-log/
+/data/
+/storage/
+/log/
