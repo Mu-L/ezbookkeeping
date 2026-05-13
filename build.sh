@@ -160,6 +160,12 @@ build_backend() {
         fi
     fi
 
+    ld_static_link_flags=""
+
+    if [ "$(uname -s)" = "Linux" ]; then
+       ld_static_link_flags="-linkmode external -extldflags '-static'"
+    fi
+
     backend_build_extra_arguments="-X main.Version=$VERSION"
     backend_build_extra_arguments="$backend_build_extra_arguments -X main.CommitHash=$COMMIT_HASH"
 
@@ -169,7 +175,7 @@ build_backend() {
 
     echo "Building backend binary file ($RELEASE_TYPE)..."
 
-    CGO_ENABLED=1 go build -a -v -trimpath -ldflags "-w -s -linkmode external -extldflags '-static' $backend_build_extra_arguments" -o ezbookkeeping ezbookkeeping.go
+    CGO_ENABLED=1 go build -a -v -trimpath -ldflags "-w -s $ld_static_link_flags $backend_build_extra_arguments" -o ezbookkeeping ezbookkeeping.go
     chmod +x ezbookkeeping
 }
 

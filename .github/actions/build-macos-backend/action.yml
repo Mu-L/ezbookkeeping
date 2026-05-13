@@ -1,0 +1,55 @@
+name: Build backend file for macOS
+
+inputs:
+  go-version:
+    required: false
+    description: "The Go version to use for building the macOS backend. The version should be in the format of 'x.y.z'."
+    default: "1.26.2"
+  release-build:
+    required: false
+    description: "Whether to build the macOS backend in release mode. If set to '1', the backend will be built in release mode. Otherwise, it will be built in development mode."
+  build-unix-time:
+    required: false
+    description: "The unix time to use for building the macOS backend. The value should be a string representing the unix time in seconds."
+  build-date:
+    required: false
+    description: "The date to use for building the macOS backend. The value should be a string representing the date in the format of 'YYYYMMDD'."
+  check-3rd-api:
+    required: false
+    description: "Whether to run integration tests that call third party APIs. If set to '1', the tests will be run. Otherwise, the tests will be skipped."
+  skip-tests:
+    required: false
+    description: "Whether to skip tests when building the macOS backend. If set to '1', the tests will be skipped. Otherwise, the tests will be run."
+  architecture:
+    required: true
+    description: "The name of the architecture to build the macOS package for."
+  backend-artifact-name-prefix:
+    required: true
+    description: "The prefix for the macOS backend artifact name."
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Go
+      uses: actions/setup-go@v6
+      with:
+        go-version: ${{ inputs.go-version }}
+
+    - name: Build backend for macOS-${{ inputs.architecture }}
+      shell: bash
+      env:
+        RELEASE_BUILD: "${{ inputs.release-build }}"
+        BUILD_PIPELINE: "1"
+        BUILD_UNIXTIME: "${{ inputs.build-unix-time }}"
+        BUILD_DATE: "${{ inputs.build-date }}"
+        CHECK_3RD_API: "${{ inputs.check-3rd-api }}"
+        SKIP_TESTS: "${{ inputs.skip-tests }}"
+      run: |
+        ./build.sh backend
+
+    - name: Upload macOS-${{ inputs.architecture }} backend artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: ${{ inputs.backend-artifact-name-prefix }}-macos-${{ inputs.architecture }}
+        path: ezbookkeeping
+        if-no-files-found: error
