@@ -422,7 +422,7 @@ export function parseDesktopOverviewLayout(value: string): DesktopOverviewLayout
 
 export function serializeDesktopOverviewLayout(layout: DesktopOverviewLayout, pretty?: boolean): string {
     const normalized = normalizeDesktopOverviewLayout(layout);
-    return JSON.stringify(normalized, null, pretty ? 2 : undefined);
+    return JSON.stringify(normalized, null, pretty ? 4 : undefined);
 }
 
 export function isDefaultMobileOverviewLayout(layout: MobileOverviewLayout): boolean {

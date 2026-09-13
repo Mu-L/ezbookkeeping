@@ -10,9 +10,7 @@
 
             <template #content>
                 <div class="w-100 h-100">
-                    <v-textarea no-resize class="w-100 h-100 ps-3 code-textarea always-cursor-text"
-                                density="compact" variant="plain" :rounded="false" :placeholder="placeholder"
-                                v-model="json"></v-textarea>
+                    <code-editor language="json" :placeholder="placeholder" v-model="json" />
                 </div>
             </template>
         </one-column-dialog-layout>

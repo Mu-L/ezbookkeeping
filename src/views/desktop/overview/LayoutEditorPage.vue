@@ -40,7 +40,7 @@
 
     <add-widget-dialog ref="addWidgetDialog" />
     <widget-settings-dialog ref="widgetSettingsDialog" />
-    <json-import-dialog ref="layoutImportDialog" :title="tt('Import Layout')" :placeholder="layoutJsonPlaceholder" :on-import="onImportLayout" />
+    <json-import-dialog ref="layoutImportDialog" :title="tt('Import Layout')" :sample-json="layoutJsonPlaceholder" :on-import="onImportLayout" />
     <json-export-dialog ref="layoutExportDialog" :title="tt('Export Layout')" :file-name="tt('dataExport.defaultOverviewLayoutFileName')" />
 
     <confirm-dialog ref="confirmDialog" />

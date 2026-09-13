@@ -1,11 +1,14 @@
 <template>
-    <div class="code-editor w-100 h-100" :class="{ 'code-editor-ready': editorReady, 'code-editor-readonly': readonly }">
+    <div class="code-editor w-100 h-100"
+         :class="{ 'code-editor-readonly': readonly, 'code-editor-rounded': !!rounded }">
         <v-textarea
             no-resize
             hide-details
-            class="code-editor-fallback w-100 h-100 code-textarea"
+            class="code-editor-fallback w-100 h-100 code-textarea ps-3"
+            variant="plain"
             :class="{ 'always-cursor-text': readonly }"
             :aria-label="ariaLabel"
+            :placeholder="placeholder"
             :readonly="readonly"
             :model-value="modelValue"
             @update:model-value="updateFallbackValue"
@@ -35,7 +38,9 @@ export interface CodeEditorExtraLib {
 
 const props = defineProps<{
     ariaLabel?: string;
+    placeholder?: string;
     readonly?: boolean;
+    rounded?: boolean;
     language: CodeEditorLanguage;
     lineNumbers?: boolean;
     extraLibs?: readonly CodeEditorExtraLib[];
@@ -129,7 +134,7 @@ onMounted(() => {
             inlineSuggest: {
                 enabled: false
             },
-            lineDecorationsWidth: props.lineNumbers ? 8 : (props.readonly ? 4 : 0),
+            lineDecorationsWidth: props.lineNumbers ? 8 : (props.readonly || !props.rounded ? 4 : 0),
             lineNumbers: props.lineNumbers ? 'on' : 'off',
             lineNumbersMinChars: props.lineNumbers ? 5 : 0,
             lightbulb: {
@@ -142,6 +147,7 @@ onMounted(() => {
             pasteAs: {
                 enabled: false
             },
+            placeholder: props.placeholder,
             padding: {
                 top: 2,
                 bottom: 2
@@ -224,6 +230,10 @@ watch(() => props.lineNumbers, lineNumbers => {
     });
 });
 
+watch(() => props.placeholder, placeholder => {
+    editor?.updateOptions({ placeholder });
+});
+
 watch(editorTheme, value => {
     editor?.updateOptions({ theme: value });
 });
@@ -233,12 +243,12 @@ watch(editorTheme, value => {
 .code-editor {
     position: relative;
     min-height: 120px;
+    overflow: hidden;
 }
 
-.code-editor-ready {
-    overflow: hidden;
+.code-editor-rounded {
     border: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
-    border-radius: 6px;
+    border-radius: var(--ebk-radius-lg);
 }
 
 .code-editor-readonly,

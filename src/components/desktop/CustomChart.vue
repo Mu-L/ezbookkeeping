@@ -13,7 +13,7 @@
                 </v-btn>
             </div>
             <code-editor class="w-100" style="height: 620px" language="javascript"
-                         :readonly="disabled" :line-numbers="true"
+                         :readonly="disabled" :rounded="true" :line-numbers="true"
                          :extra-libs="customChartEditorExtraLibs" v-model="customScript" />
         </v-col>
         <v-col cols="12" :md="displayLayout.showCode ? 6 : 12" v-if="displayLayout.showChart">
@@ -31,7 +31,7 @@
             </div>
             <div class="w-100">
                 <code-editor class="w-100" style="height: 620px" language="json"
-                             :readonly="true" :model-value="displayChartData" />
+                             :readonly="true" :rounded="true" :model-value="displayChartData" />
             </div>
         </v-col>
     </v-row>

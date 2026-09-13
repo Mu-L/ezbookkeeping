@@ -19,11 +19,8 @@
             </template>
 
             <template #content>
-                <div class="w-100 h-100 code-container">
-                    <v-textarea no-resize class="w-100 h-100 ps-3 always-cursor-text"
-                                density="compact" variant="plain"
-                                :readonly="true" :rounded="false"
-                                :value="json"></v-textarea>
+                <div class="w-100 h-100">
+                    <code-editor language="json" :readonly="true" :model-value="json" />
                 </div>
             </template>
         </one-column-dialog-layout>
