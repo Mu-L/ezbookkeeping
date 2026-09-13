@@ -1518,6 +1518,8 @@
                 "destinationCurrency": "Currency code of the destination account, available for transfer transactions",
                 "sourceAmount": "Source amount (including two decimal places expressed without a decimal separator, for example '12345' represents 123.45)",
                 "destinationAmount": "Destination amount (available for transfer transaction, format is the same as the source amount)",
+                "sourceAmountInDefaultCurrency": "Source amount converted to the user's default currency (unavailable when the exchange rate is missing, format is the same as the source amount)",
+                "destinationAmountInDefaultCurrency": "Destination amount converted to the user's default currency (available for transfer transactions when the exchange rate exists, format is the same as the source amount)",
                 "tagNames": "Array of transaction tag names",
                 "geoLocation": "Transaction geolocation containing latitude and longitude",
                 "comment": "Transaction description"

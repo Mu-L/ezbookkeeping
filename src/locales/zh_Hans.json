@@ -1518,6 +1518,8 @@
                 "destinationCurrency": "目标账户的货币代码，仅转账交易存在",
                 "sourceAmount": "来源金额 (包含2位小数，但不包含小数点，例如：'12345' 表示 123.45 元)",
                 "destinationAmount": "目标金额 (仅转账交易存在，格式同来源金额)",
+                "sourceAmountInDefaultCurrency": "按用户默认货币换算的来源金额 (汇率不可用时不存在，格式同来源金额)",
+                "destinationAmountInDefaultCurrency": "按用户默认货币换算的目标金额 (仅转账交易且汇率可用时存在，格式同来源金额)",
                 "tagNames": "交易标签名称数组",
                 "geoLocation": "交易地理位置，包含纬度和经度",
                 "comment": "交易描述"

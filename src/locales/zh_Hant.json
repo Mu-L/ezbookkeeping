@@ -1518,6 +1518,8 @@
                 "destinationCurrency": "目標帳戶的貨幣代碼，轉帳交易才會提供",
                 "sourceAmount": "來源金額 (包含2位小數，但不包含小數點，例如：'12345' 表示 123.45 元)",
                 "destinationAmount": "目標金額 (轉帳交易才會提供, 格式同來源金額)",
+                "sourceAmountInDefaultCurrency": "按使用者預設貨幣換算的來源金額 (匯率無法使用時不存在，格式同來源金額)",
+                "destinationAmountInDefaultCurrency": "按使用者預設貨幣換算的目標金額 (僅轉帳交易且匯率可用時存在，格式同來源金額)",
                 "tagNames": "交易標籤名稱陣列",
                 "geoLocation": "交易的地理位置，包含緯度與經度",
                 "comment": "交易描述"

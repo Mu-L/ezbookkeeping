@@ -49,11 +49,15 @@ import { ref, computed, useTemplateRef, onMounted, onUnmounted, watch } from 'vu
 import { useI18n } from '@/locales/helpers.ts';
 
 import { useSettingsStore } from '@/stores/setting.ts';
+import { useUserStore } from '@/stores/user.ts';
+import { useExchangeRatesStore } from '@/stores/exchangeRates.ts';
 
+import type { BigDecimal } from '@/core/numeral.ts';
 import { TransactionType } from '@/core/transaction.ts';
 import { TransactionExplorerCustomChartDisplayLayout } from '@/core/explorer.ts';
 import type { TransactionInsightDataItem } from '@/models/transaction.ts';
 
+import { parseBigDecimal } from '@/lib/numeral.ts';
 import { parseDateTimeFromUnixTimeWithTimezoneOffset } from '@/lib/datetime.ts';
 import logger from '@/lib/logger.ts';
 
@@ -95,6 +99,8 @@ interface CustomChartTransaction {
     destinationCurrency?: string;
     sourceAmount: number;
     destinationAmount: number;
+    sourceAmountInDefaultCurrency?: number;
+    destinationAmountInDefaultCurrency?: number;
     tagNames: string[];
     geoLocation?: {
         latitude: number;
@@ -119,6 +125,8 @@ const {
 } = useI18n();
 
 const settingsStore = useSettingsStore();
+const userStore = useUserStore();
+const exchangeRatesStore = useExchangeRatesStore();
 
 const sandboxMessageSignature: string = '#ezBookkeeping-sandbox-message#';
 const sandboxBuildinScripts: string = `
@@ -213,6 +221,10 @@ interface CustomChartTransaction {
     sourceAmount: number;
     /** ${tt('sample.insightsExplorerCustomChart.transactionField.destinationAmount')} */
     destinationAmount: number;
+    /** ${tt('sample.insightsExplorerCustomChart.transactionField.sourceAmountInDefaultCurrency')} */
+    sourceAmountInDefaultCurrency?: number;
+    /** ${tt('sample.insightsExplorerCustomChart.transactionField.destinationAmountInDefaultCurrency')} */
+    destinationAmountInDefaultCurrency?: number;
     /** ${tt('sample.insightsExplorerCustomChart.transactionField.tagNames')} */
     tagNames: string[];
     /** ${tt('sample.insightsExplorerCustomChart.transactionField.geoLocation')} */
@@ -389,8 +401,8 @@ function sumTransactionAmounts(transactions) {
     }
 
     return transactions.reduce((sum, transaction) => {
-        if (typeof transaction.sourceAmount === 'number') {
-            return sum + transaction.sourceAmount;
+        if (typeof transaction.sourceAmountInDefaultCurrency === 'number') {
+            return sum + transaction.sourceAmountInDefaultCurrency;
         }
 
         return sum;
@@ -418,6 +430,8 @@ function sumTransactionAmounts(transactions) {
  * {string} destinationCurrency - ${tt('sample.insightsExplorerCustomChart.transactionField.destinationCurrency')}
  * {number} sourceAmount - ${tt('sample.insightsExplorerCustomChart.transactionField.sourceAmount')}
  * {number} destinationAmount - ${tt('sample.insightsExplorerCustomChart.transactionField.destinationAmount')}
+ * {number} sourceAmountInDefaultCurrency - ${tt('sample.insightsExplorerCustomChart.transactionField.sourceAmountInDefaultCurrency')}
+ * {number} destinationAmountInDefaultCurrency - ${tt('sample.insightsExplorerCustomChart.transactionField.destinationAmountInDefaultCurrency')}
  * {string[]} tagNames - ${tt('sample.insightsExplorerCustomChart.transactionField.tagNames')}
  * {string} geoLocation - ${tt('sample.insightsExplorerCustomChart.transactionField.geoLocation')}
  * {string} comment - ${tt('sample.insightsExplorerCustomChart.transactionField.comment')}
@@ -444,7 +458,18 @@ const displayChartData = computed<string>(() => {
 const customChartTransactions = computed<CustomChartTransaction[]>(() => {
     return props.transactions.map(transaction => {
         const transactionTime = parseDateTimeFromUnixTimeWithTimezoneOffset(transaction.time, transaction.utcOffset);
+        const defaultCurrency = userStore.currentUserDefaultCurrency;
         let transactionType: string = '';
+        let sourceAmountInDefaultCurrency: BigDecimal | undefined = parseBigDecimal(transaction.sourceAmount);
+        let destinationAmountInDefaultCurrency = transaction.type === TransactionType.Transfer && transaction.destinationAccount ? parseBigDecimal(transaction.destinationAmount) : undefined;
+
+        if (transaction.sourceAccount.currency !== defaultCurrency) {
+            sourceAmountInDefaultCurrency = exchangeRatesStore.getExchangedAmount(sourceAmountInDefaultCurrency, transaction.sourceAccount.currency, defaultCurrency)?.truncate();
+        }
+
+        if (destinationAmountInDefaultCurrency && transaction.destinationAccount && transaction.destinationAccount.currency !== defaultCurrency) {
+            destinationAmountInDefaultCurrency = exchangeRatesStore.getExchangedAmount(destinationAmountInDefaultCurrency, transaction.destinationAccount.currency, defaultCurrency)?.truncate();
+        }
 
         if (transaction.type === TransactionType.Income) {
             transactionType = tt('Income');
@@ -478,6 +503,8 @@ const customChartTransactions = computed<CustomChartTransaction[]>(() => {
             destinationCurrency: transaction.destinationAccount?.currency,
             sourceAmount: transaction.sourceAmount,
             destinationAmount: transaction.destinationAmount,
+            sourceAmountInDefaultCurrency: sourceAmountInDefaultCurrency?.toDoubleNumber(),
+            destinationAmountInDefaultCurrency: destinationAmountInDefaultCurrency?.toDoubleNumber(),
             tagNames: transaction.tags?.map(tag => tag.name) ?? [],
             geoLocation: transaction.geoLocation ? {
                 latitude: transaction.geoLocation.latitude,
